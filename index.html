@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Available Games</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f0f0;
+        padding: 20px;
+    }
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+    #search {
+        display: block;
+        width: 100%;
+        max-width: 400px;
+        margin: 20px auto;
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #aaa;
+    }
+    #buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+    .game-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        background: #007bff;
+        color: #fff;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .game-btn:hover {
+        background: #0056b3;
+    }
+</style>
+</head>
+<body>
+
+<h1>Available Games</h1>
+<input type="text" id="search" placeholder="Search games...">
+<div id="buttons"></div>
+
+<script>
+const owner = "Tiboblh";
+const repo = "apps";
+const apiURL = `https://api.github.com/repos/${owner}/${repo}/contents/`;
+
+const container = document.getElementById("buttons");
+const searchInput = document.getElementById("search");
+
+let games = [];
+
+fetch(apiURL)
+.then(res => res.json())
+.then(data => {
+    // Filtrer uniquement les dossiers à la racine
+    games = data.filter(item => item.type === "dir" && item.path.split("/").length === 1);
+    renderButtons(games);
+})
+.catch(err => console.error("API Error:", err));
+
+function renderButtons(list) {
+    container.innerHTML = "";
+    list.forEach(item => {
+        const btn = document.createElement("button");
+        btn.textContent = item.name;
+        btn.className = "game-btn";
+        btn.onclick = () => {
+            window.open(`https://super-school.netlify.app/${item.name}/index.html`, "_blank");
+        };
+        container.appendChild(btn);
+    });
+}
+
+// Recherche en temps réel
+searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    const filtered = games.filter(item => item.name.toLowerCase().includes(query));
+    renderButtons(filtered);
+});
+</script>
+
+</body>
+</html>
